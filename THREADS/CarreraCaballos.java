@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
-import javax.swing.ImageIcon;
 
 public class CarreraCaballos extends JFrame {
     private JProgressBar[] progressBars;
@@ -14,9 +13,9 @@ public class CarreraCaballos extends JFrame {
     private Timer animationTimer;
     private Thread[] caballos;
     private boolean carreraEnCurso = false;
-    private boolean ganadorEncontrado = false;
     private int ganador = -1;
-    private boolean isHorse2 = false;
+    private int[] caballoImages;
+    private String[] imagePaths = {"horse1.png", "horse2.png", "horse3.png", "horse4.png"};
 
     public CarreraCaballos() {
         setTitle("Carrera de Caballos");
@@ -27,12 +26,14 @@ public class CarreraCaballos extends JFrame {
         progressBars = new JProgressBar[4];
         caballoLabels = new JLabel[4];
         caballos = new Thread[4];
+        caballoImages = new int[4];
 
         for (int i = 0; i < 4; i++) {
             progressBars[i] = new JProgressBar(0, 100);
             progressBars[i].setValue(0);
             progressBars[i].setStringPainted(true);
-            caballoLabels[i] = new JLabel(createImageIcon("horse3.png"));
+            caballoLabels[i] = new JLabel(createImageIcon(imagePaths[i]));
+            caballoImages[i] = i;
         }
 
         btnIniciar = new JButton("Iniciar Carrera");
@@ -61,14 +62,14 @@ public class CarreraCaballos extends JFrame {
             panel.add(progressBars[i]);
         }
         panel.add(btnIniciar);
-
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
         add(panel);
     }
 
     private void iniciarCarrera() {
         carreraEnCurso = true;
-        ganadorEncontrado = false;
-        isHorse2 = false;
+        ganador = -1;
         animationTimer.start();
 
         for (int i = 0; i < 4; i++) {
@@ -88,13 +89,13 @@ public class CarreraCaballos extends JFrame {
         @Override
         public void run() {
             Random rand = new Random();
-            while (progressBars[caballoId].getValue() < 100 && !ganadorEncontrado) {
+            while (progressBars[caballoId].getValue() < 100 && ganador == -1) {
                 int avance = rand.nextInt(15) + 1;
                 int newValue = progressBars[caballoId].getValue() + avance;
                 if (newValue >= 100) {
                     newValue = 100;
-                    ganadorEncontrado = true;
                     ganador = caballoId;
+                    animationTimer.stop();
                     mostrarGanador();
                 }
                 progressBars[caballoId].setValue(newValue);
@@ -120,25 +121,22 @@ public class CarreraCaballos extends JFrame {
     private void reiniciarCarrera() {
         carreraEnCurso = false;
         ganador = -1;
-        animationTimer.stop();
 
         for (int i = 0; i < 4; i++) {
             caballos[i].interrupt();
-            caballoLabels[i].setIcon(createImageIcon("horse3.png"));
+            caballoLabels[i].setIcon(createImageIcon(imagePaths[i]));
         }
     }
 
     private void alternarAnimacion() {
-        if (isHorse2) {
-            for (int i = 0; i < 4; i++) {
-                caballoLabels[i].setIcon(createImageIcon("horse3.png"));
+        for (int i = 0; i < 4; i++) {
+            if (caballoImages[i] == i) {
+                caballoLabels[i].setIcon(createImageIcon("horsemove.png"));
+                caballoImages[i] = 4;
+            } else {
+                caballoLabels[i].setIcon(createImageIcon(imagePaths[i]));
+                caballoImages[i] = i;
             }
-            isHorse2 = false;
-        } else {
-            for (int i = 0; i < 4; i++) {
-                caballoLabels[i].setIcon(createImageIcon("horse2.png"));
-            }
-            isHorse2 = true;
         }
     }
 
