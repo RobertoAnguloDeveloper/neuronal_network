@@ -16,7 +16,7 @@ modelo.compile(
 
 print("Entrenando la red")
 
-entrenamiento = modelo.fit(entrada, salida, epochs=2500, verbose=False)
+entrenamiento = modelo.fit(entrada, salida, epochs=2900, verbose=False)
 
 modelo.save('RedNeuronal.keras')
 modelo.save_weights('Weights.keras')
